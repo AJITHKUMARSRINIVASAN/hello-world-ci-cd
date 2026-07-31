@@ -1,1 +1,1 @@
-print("Hello, World! This is a simple Python application.")
+print("Hello, World! This is a simple Python application. Develpoed by AK")
