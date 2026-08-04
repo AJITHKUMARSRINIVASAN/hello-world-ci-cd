@@ -10,8 +10,8 @@ jobs:
   build-and-push:
     runs-on: ubuntu-latest
     env:
-      DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME || 'ajithkumar1828' }}
-      DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD || secrets.DOCKERHUB_TOKEN || secrets.DOCKER_TOKEN || secrets.DOCKER_ACCESS_TOKEN }}
+      DOCKER_USERNAME: ajithkumar1828
+      DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
       IMAGE_NAME: hello-world
 
     steps:
@@ -20,13 +20,8 @@ jobs:
 
       - name: Check Docker Hub secrets
         run: |
-          if [ -z "$DOCKER_USERNAME" ]; then
-            echo "::error::Missing Docker Hub username. Add DOCKER_USERNAME as a repository secret, or keep the hardcoded username in this workflow."
-            exit 1
-          fi
-
-          if [ -z "$DOCKER_PASSWORD" ]; then
-            echo "::error::Missing Docker Hub token. Add one of these repository secrets in AJITHKUMARSRINIVASAN/hello-world-ci-cd: DOCKER_PASSWORD, DOCKERHUB_TOKEN, DOCKER_TOKEN, or DOCKER_ACCESS_TOKEN."
+          if [ -z "$DOCKERHUB_TOKEN" ]; then
+            echo "::error::Missing Docker Hub token. Add a repository secret named DOCKERHUB_TOKEN in AJITHKUMARSRINIVASAN/hello-world-ci-cd."
             exit 1
           fi
 
@@ -34,7 +29,7 @@ jobs:
         uses: docker/login-action@v4
         with:
           username: ${{ env.DOCKER_USERNAME }}
-          password: ${{ env.DOCKER_PASSWORD }}
+          password: ${{ env.DOCKERHUB_TOKEN }}
 
       - name: Build Docker Image
         run: |
