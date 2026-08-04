@@ -9,35 +9,41 @@ on:
 jobs:
   build-and-push:
     runs-on: ubuntu-latest
+    env:
+      DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME || 'ajithkumar1828' }}
+      DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD || secrets.DOCKERHUB_TOKEN }}
+      IMAGE_NAME: hello-world
 
     steps:
       - name: Checkout source
         uses: actions/checkout@v5
 
       - name: Check Docker Hub secrets
-        env:
-          DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
-          DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
         run: |
-          if [ -z "$DOCKER_USERNAME" ] || [ -z "$DOCKER_PASSWORD" ]; then
-            echo "::error::Missing Docker Hub secrets. Add DOCKER_USERNAME and DOCKER_PASSWORD in GitHub repository Settings > Secrets and variables > Actions."
+          if [ -z "$DOCKER_USERNAME" ]; then
+            echo "::error::Missing Docker Hub username. Add DOCKER_USERNAME as a repository secret, or keep the hardcoded username in this workflow."
+            exit 1
+          fi
+
+          if [ -z "$DOCKER_PASSWORD" ]; then
+            echo "::error::Missing Docker Hub token. Add DOCKER_PASSWORD or DOCKERHUB_TOKEN as a repository secret in this repo: AJITHKUMARSRINIVASAN/hello-world-ci-cd."
             exit 1
           fi
 
       - name: Login to Docker Hub
         uses: docker/login-action@v4
         with:
-          username: ${{ secrets.DOCKER_USERNAME }}
-          password: ${{ secrets.DOCKER_PASSWORD }}
+          username: ${{ env.DOCKER_USERNAME }}
+          password: ${{ env.DOCKER_PASSWORD }}
 
       - name: Build Docker Image
         run: |
-          docker build -t ${{ secrets.DOCKER_USERNAME }}/hello-world:latest .
+          docker build -t "$DOCKER_USERNAME/$IMAGE_NAME:latest" .
 
       - name: Test Docker Image
         run: |
-          docker run --rm ${{ secrets.DOCKER_USERNAME }}/hello-world:latest
+          docker run --rm "$DOCKER_USERNAME/$IMAGE_NAME:latest"
 
       - name: Push Docker Image
         run: |
-          docker push ${{ secrets.DOCKER_USERNAME }}/hello-world:latest
+          docker push "$DOCKER_USERNAME/$IMAGE_NAME:latest"
