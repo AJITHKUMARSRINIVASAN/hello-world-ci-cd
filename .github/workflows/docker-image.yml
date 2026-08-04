@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME || 'ajithkumar1828' }}
-      DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD || secrets.DOCKERHUB_TOKEN }}
+      DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD || secrets.DOCKERHUB_TOKEN || secrets.DOCKER_TOKEN || secrets.DOCKER_ACCESS_TOKEN }}
       IMAGE_NAME: hello-world
 
     steps:
@@ -26,7 +26,7 @@ jobs:
           fi
 
           if [ -z "$DOCKER_PASSWORD" ]; then
-            echo "::error::Missing Docker Hub token. Add DOCKER_PASSWORD or DOCKERHUB_TOKEN as a repository secret in this repo: AJITHKUMARSRINIVASAN/hello-world-ci-cd."
+            echo "::error::Missing Docker Hub token. Add one of these repository secrets in AJITHKUMARSRINIVASAN/hello-world-ci-cd: DOCKER_PASSWORD, DOCKERHUB_TOKEN, DOCKER_TOKEN, or DOCKER_ACCESS_TOKEN."
             exit 1
           fi
 
